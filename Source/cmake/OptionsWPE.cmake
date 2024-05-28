@@ -3,6 +3,7 @@ include(VersioningUtils)
 
 SET_PROJECT_VERSION(2 28 4)
 set(WPE_API_VERSION 1.0)
+add_definitions(-DWPE_API_VERSION="${WPE_API_VERSION}")
 
 CALCULATE_LIBRARY_VERSIONS_FROM_LIBTOOL_TRIPLE(WEBKIT 13 6 10)
 
@@ -84,6 +85,7 @@ WEBKIT_OPTION_DEFINE(ENABLE_WPE_QT_API "Whether to enable support for the Qt5/QM
 WEBKIT_OPTION_DEFINE(USE_SYSTEMD "Whether to enable journald logging" PUBLIC OFF)
 WEBKIT_OPTION_DEFINE(ENABLE_BREAKPAD "Whether or not enable breakpad minidump support." PUBLIC OFF)
 WEBKIT_OPTION_DEFINE(USE_SOUP2 "Whether to enable usage of Soup 2 instead of Soup 3." PUBLIC OFF)
+WEBKIT_OPTION_DEFINE(ENABLE_ONSCREEN_KEYBOARD "Whether to enable on-screen keyboard support" PUBLIC ON)
 
 # Private options specific to the WPE port.
 WEBKIT_OPTION_DEFINE(USE_GSTREAMER_HOLEPUNCH "Whether to enable GStreamer holepunch" PRIVATE OFF)

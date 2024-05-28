@@ -102,6 +102,11 @@
 #include <libnotify/notify.h>
 #endif
 
+#if ENABLE(ONSCREEN_KEYBOARD)
+#include <sys/mman.h>
+#include <fcntl.h>
+#endif
+
 using namespace WebKit;
 using namespace WebCore;
 
@@ -732,6 +737,59 @@ static gboolean webkitWebViewShowNotification(WebKitWebView*, WebKitNotification
 #endif
 }
 
+#if ENABLE(ONSCREEN_KEYBOARD)
+static gboolean injectUserScript(WebKitUserContentManager* contentManager, gchar* path)
+{
+    int fd = open(path, O_RDONLY);
+    if (fd < 0)
+        return FALSE;
+
+    int size = lseek(fd, 0, SEEK_END);
+    char *scriptText = static_cast<char*>(mmap(NULL, size, PROT_READ, MAP_PRIVATE, fd, 0));
+    if (scriptText == MAP_FAILED) {
+        close(fd);
+        return FALSE;
+    }
+
+    GRefPtr<WebKitUserScript> userScript = adoptGRef(webkit_user_script_new_for_world(scriptText,
+                                                                                      WEBKIT_USER_CONTENT_INJECT_TOP_FRAME,
+                                                                                      WEBKIT_USER_SCRIPT_INJECT_AT_DOCUMENT_END,
+                                                                                      "keyboard",
+                                                                                      NULL, NULL));
+    webkit_user_content_manager_add_script(contentManager, userScript.get());
+
+    munmap(scriptText, size);
+    close(fd);
+
+    return TRUE;
+}
+
+static gboolean injectUserStyleSheet(WebKitUserContentManager* contentManager, gchar* path)
+{
+    int fd = open(path, O_RDONLY);
+    if (fd < 0)
+        return FALSE;
+
+    int size = lseek(fd, 0, SEEK_END);
+    char *styleSheetText = static_cast<char*>(mmap(NULL, size, PROT_READ, MAP_PRIVATE, fd, 0));
+    if (styleSheetText == MAP_FAILED) {
+        close(fd);
+        return FALSE;
+    }
+
+    GRefPtr<WebKitUserStyleSheet> userStyleSheet = adoptGRef(webkit_user_style_sheet_new(styleSheetText,
+                                                                                         WEBKIT_USER_CONTENT_INJECT_TOP_FRAME,
+                                                                                         WEBKIT_USER_STYLE_LEVEL_USER,
+                                                                                         NULL, NULL));
+    webkit_user_content_manager_add_style_sheet(contentManager, userStyleSheet.get());
+
+    munmap(styleSheetText, size);
+    close(fd);
+
+    return TRUE;
+}
+#endif
+
 static void webkitWebViewConstructed(GObject* object)
 {
     G_OBJECT_CLASS(webkit_web_view_parent_class)->constructed(object);
@@ -752,6 +810,22 @@ static void webkitWebViewConstructed(GObject* object)
 
     if (!priv->userContentManager)
         priv->userContentManager = adoptGRef(webkit_user_content_manager_new());
+
+#if ENABLE(ONSCREEN_KEYBOARD)
+    const gchar* const* dataDirs = g_get_system_data_dirs();
+
+    for (int i = 0; dataDirs[i] != NULL; i++) {
+        GUniquePtr<gchar> path(g_build_filename(dataDirs[i], "wpe-webkit-" WPE_API_VERSION, "keyboard.js", NULL));
+        if (injectUserScript(priv->userContentManager.get(), path.get()))
+            break;
+    }
+
+    for (int i = 0; dataDirs[i] != NULL; i++) {
+        GUniquePtr<gchar> path(g_build_filename(dataDirs[i], "wpe-webkit-" WPE_API_VERSION, "keyboard.css", NULL));
+        if (injectUserStyleSheet(priv->userContentManager.get(), path.get()))
+            break;
+    }
+#endif
 
     if (priv->isEphemeral && !webkit_web_context_is_ephemeral(priv->context.get())) {
         priv->websiteDataManager = adoptGRef(webkit_website_data_manager_new_ephemeral());

@@ -449,3 +449,10 @@ install(FILES ${WPE_API_INSTALLED_HEADERS}
         DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/wpe-webkit-${WPE_API_VERSION}/wpe"
         COMPONENT "Development"
 )
+
+if (ENABLE_ONSCREEN_KEYBOARD)
+    install(FILES ${WEBKIT_DIR}/wpe/keyboard.js ${WEBKIT_DIR}/wpe/keyboard.css
+            DESTINATION ${CMAKE_INSTALL_DATADIR}/wpe-webkit-${WPE_API_VERSION}
+            COMPONENT "runtime"
+    )
+endif ()

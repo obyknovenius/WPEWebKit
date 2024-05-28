@@ -1,0 +1,83 @@
+#wpe-keyboard {
+    background: #3f3f3f !important;
+}
+
+#wpe-keyboard .key-layout .key-row {
+    display: grid !important;
+    grid-template-columns: repeat(13, 1fr) !important;
+    justify-content: center !important;
+}
+
+#wpe-keyboard .key-layout .key-row .key {
+    height: 76px !important;
+    min-width: fit-content !important;
+    font: 22px sans-serif !important;
+    color: #fefefe !important;
+    background: #57575d !important;
+    border: #3f3f3f 8px solid !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 10px !important; 
+    position: relative !important;
+}
+
+#wpe-keyboard:not(.cap) .key-layout .key-row .key .text:not(.cap) {
+    display: inline !important;
+}
+
+#wpe-keyboard:not(.cap) .key-layout .key-row .key .text.cap {
+    display: none !important;
+}
+
+#wpe-keyboard.cap .key-layout .key-row .key .text:not(.cap) {
+    display: none !important;
+}
+
+#wpe-keyboard.cap .key-layout .key-row .key .text.cap {
+    display: inline !important;
+}
+
+#wpe-keyboard .key-layout .key-row .key .text.alt {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    margin: 4px 0 0 8px !important;
+    font: 16px sans-serif !important;
+    color: #b8b8b8 !important;
+}
+
+#wpe-keyboard .key-layout .key-row .key .icon {
+    height: 22px !important;
+    fill: currentColor !important;
+}
+
+#wpe-keyboard .key-layout .key-row .key.pressed {
+    transform: scaleY(0.95) translateY(4px) !important;
+}
+
+#wpe-keyboard .key-layout .key-row .key.disabled {
+    background: #7b7C7d !important;
+    transform: none !important;
+}
+
+#wpe-keyboard .key-layout .key-row #enter.key {
+    grid-column: 12 / 14 !important;
+}
+
+#wpe-keyboard .key-layout .key-row #backspace.key {
+    grid-column: 12 / 14 !important;
+}
+
+#wpe-keyboard .key-layout .key-row #mode.key {
+    grid-column: 1 / 4 !important;
+}
+
+#wpe-keyboard .key-layout .key-row #spacebar.key {
+    grid-column: 4 / 12 !important;
+}
+
+#wpe-keyboard .key-layout .key-row #done.key {
+    background: none !important;
+    grid-column: 12 / 14 !important;
+}
